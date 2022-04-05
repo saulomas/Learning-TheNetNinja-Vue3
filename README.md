@@ -1,4 +1,4 @@
-# learning-thenetninja-vue3
+# reaction-timer-game
 
 ## Project setup
 ```
