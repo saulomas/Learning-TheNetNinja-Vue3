@@ -1,50 +1,42 @@
 <template>
   <div class="home">
     <h1>Home</h1>
-    <input type="text" v-model="search">
-    <p>Search term: {{ search }}</p>
-    <table class="center">
-      <tr>
-        <td>
-          <div v-for="name in names" :key="name">{{ name }}</div>
-        </td>
-        <td>
-          <div v-for="name in matchingNames" :key="name">{{ name }}</div>
-        </td>
-      </tr>
-    </table>
-    <button @click="handleClick">Stop Watching</button>
+    <div v-if="error">{{ error }}</div>
+    <div v-if="posts.length">
+      <PostList :posts="posts"/>
+    </div>
+    <div v-else>Loading...</div>
   </div>
 </template>
 
 <script>
-import { computed, ref, watch, watchEffect } from 'vue'
+import { ref } from 'vue'
+import PostList from '../components/PostList.vue'
 
 export default {
-  name: 'HomeView',
-  setup() {
-    const search = ref('')
-    const names = ref(['mario', 'yoshi', 'luigi', 'toad', 'bowser', 'koopa', 'peach'])
+    name: "HomeView",
+    components: { PostList },
+    setup() {
+      const posts = ref([])
+      const error = ref(null)
 
-    const stopWatch = watch(search, () => {
-      console.log('Watch function ran')
-    })
+      const load = async() => {
+        try {
+          let data = await fetch('http://localhost:3000/posts')
+          if (!data.ok) {
+            throw Error('No data available')
+          }
+          posts.value = await data.json()
+        } catch (err) {
+          error.value = err.message
+          console.log(error.value)
+        }
+      }
 
-    const stopEffect = watchEffect(() => {
-      console.log('WatchEffect runction ran', search.value)
-    })
+      load()
 
-    const matchingNames = computed(() => {
-      return names.value.filter((name) => name.includes(search.value))
-    })
-
-    const handleClick = () => {
-      stopWatch()
-      stopEffect()
+      return { posts, error }
     }
-
-    return { names, search, matchingNames, handleClick }
-  }
 }
 </script>
 
