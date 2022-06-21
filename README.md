@@ -1,4 +1,4 @@
-# learning-thenetninja-vue3
+# projcompositionapi
 
 ## Project setup
 ```
